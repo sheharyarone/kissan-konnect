@@ -1,27 +1,53 @@
-// src/screens/SearchScreen.js
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Button } from 'react-native';
-import styles from './style';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+
+const audioRecorderPlayer = new AudioRecorderPlayer();
 
 const SearchScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [recordedText, setRecordedText] = useState('');
+  const [recordedAudio, setRecordedAudio] = useState('');
 
-  const handleRecordToggle = () => {
-    setIsRecording(!isRecording);
-
+  const handleRecordToggle = async () => {
     if (!isRecording) {
-      // Start recording logic here (e.g., use react-native-voice or react-native-audio)
-      console.log('Recording started...');
+      try {
+        const result = await audioRecorderPlayer.startRecorder();
+        setIsRecording(true);
+        console.log('Recording started:', result);
+      } catch (error) {
+        console.error('Recording error:', error);
+      }
     } else {
-      // Stop recording logic here
-      console.log('Recording stopped...');
+      try {
+        const result = await audioRecorderPlayer.stopRecorder();
+        setRecordedAudio(result);
+        setIsRecording(false);
+        console.log('Recording stopped:', result);
+      } catch (error) {
+        console.error('Stopping recording error:', error);
+      }
     }
   };
 
-  const handleSend = () => {
-    // Logic to handle sending the recorded text or audio
-    console.log('Sending:', recordedText);
+  const handlePlayback = async () => {
+    if (recordedAudio) {
+      try {
+        await audioRecorderPlayer.startPlayer(recordedAudio);
+        console.log('Playing audio:', recordedAudio);
+      } catch (error) {
+        console.error('Playback error:', error);
+      }
+    }
+  };
+
+  const handleSendAudio = () => {
+    console.log('Audio sent to API:', recordedAudio);
+    // Implement your API call here
+  };
+
+  const handleRecordAgain = () => {
+    setRecordedAudio('');
+    setIsRecording(false); // Reset the recording state to false
   };
 
   return (
@@ -29,20 +55,41 @@ const SearchScreen = () => {
       <Text style={styles.title}>Voice Search</Text>
 
       <TouchableOpacity style={styles.recordButton} onPress={handleRecordToggle}>
-        <Text style={styles.recordText}>{isRecording ? 'Stop Recording' : 'Start Recording'}</Text>
-      </TouchableOpacity>
-
-      <View style={styles.recordedTextContainer}>
-        <Text style={styles.recordedText}>
-          {isRecording ? 'Recording in progress...' : recordedText || 'No recorded input'}
+        <Text style={styles.recordText}>
+          {isRecording ? 'Stop Recording' : 'Start Recording'}
         </Text>
-      </View>
-
-      <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-        <Text style={styles.sendButtonText}>Send</Text>
       </TouchableOpacity>
+
+      {recordedAudio && (
+        <View style={styles.controlContainer}>
+          <TouchableOpacity style={styles.controlButton} onPress={handlePlayback}>
+            <Text style={styles.controlButtonText}>Play</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.controlButton} onPress={handleSendAudio}>
+            <Text style={styles.controlButtonText}>Send</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.controlButton} onPress={handleRecordAgain}>
+            <Text style={styles.controlButtonText}>Record Again</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#EFEFEF' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  recordButton: {
+    padding: 20,
+    backgroundColor: '#FF6347',
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  recordText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  controlContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingHorizontal: 20 },
+  controlButton: { padding: 15, backgroundColor: '#4CAF50', borderRadius: 10, flex: 1, marginHorizontal: 5 },
+  controlButtonText: { color: '#fff', textAlign: 'center', fontWeight: 'bold' },
+});
 
 export default SearchScreen;
