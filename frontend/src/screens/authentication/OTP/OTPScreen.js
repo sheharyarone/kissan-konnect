@@ -1,21 +1,20 @@
 // src/screens/OtpScreen.js
 import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native'; // Import navigation hook
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../../redux/actions/authActions';
 import styles from './styles';
-
 
 const OTPScreen = ({ route }) => {
   const { phoneNumber } = route.params;
   const [otp, setOtp] = useState('');
-  
+  const dispatch = useDispatch();
 
   const handleOtpSubmit = () => {
-    // You can add OTP validation logic here
-    console.log(`OTP Entered: ${otp}`);
-
-    // After OTP is validated, navigate to the AppStack
-    navigation.replace('AppStack'); // Replace AuthStack with AppStack
+    // Mock OTP validation logic
+    if (otp === '1234') {
+      dispatch(loginSuccess());  // Dispatch login action to set isAuthenticated to true
+    }
   };
 
   return (
@@ -35,7 +34,5 @@ const OTPScreen = ({ route }) => {
     </View>
   );
 };
-
-
 
 export default OTPScreen;
