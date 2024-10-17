@@ -2,15 +2,17 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../../screens/home/homeScreen';
+ import SearchScreen from '../../screens/search/searchScreen';
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Home" component={HomeScreen} />
-      {/* Add more screens here */}
-    </Stack.Navigator>
+  <Stack.Navigator>
+    <Stack.Screen name="Home" component={HomeScreen} />
+    {/* <Stack.Screen name="UploadScreen" component={UploadScreen} /> */}
+    <Stack.Screen name="SearchScreen" component={SearchScreen} />
+  </Stack.Navigator>
   );
 };
 
